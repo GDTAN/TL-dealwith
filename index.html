@@ -23,6 +23,8 @@
     </div>
     <div class="content">   
         <textarea rows="20" cols="20" id="txt"></textarea>
+        <button class="clear">清空文本框</button>
+        <button class="clearFull">清空暂存区</button>
         <button class="sxStop">暂存</button>
         <a href="javascript:void(0)" class="export">导出</a>
     </div>
@@ -31,6 +33,15 @@
     * {
         margin: 0;
         padding: 0;
+    }
+
+    .header{
+        margin: 10px 0 0 10px;
+    }
+
+    .car {
+        height: 20px;
+        margin: 0 10px 0 5px;
     }
 
     .content {
@@ -46,8 +57,24 @@
         background-color: rgba(250, 247, 247, 0.842);
         /* background-color: red;     */
     }
+    .clear {
+        position: absolute;
+        top: 50px;
+        left: 600px;
+        /* background-color: yellow; */
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #E6A23C;
+        color: white;
+        border: none;
+        text-decoration:none;
+    }
 
-    .sxStop{
+    .clearFull{
         position: absolute;
         top: 180px;
         left: 600px;
@@ -58,7 +85,24 @@
         line-height: 40px;
         text-align: center;
         border-radius: 5px;
-        background-color: #5EADFF;
+        background-color: #F78989;
+        color: white;
+        border: none;
+        text-decoration:none;
+    }
+
+    .sxStop{
+        position: absolute;
+        bottom: 180px;
+        left: 600px;
+        /* background-color: yellow; */
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #67C23A;
         color: white;
         border: none;
         text-decoration:none;
@@ -66,7 +110,7 @@
 
     .export {
         position: absolute;
-        bottom: 180px;
+        bottom: 50px;
         left: 600px;
         /* background-color: yellow; */
         cursor: pointer;
@@ -81,7 +125,7 @@
         text-decoration:none;
     }
 
-    .export:hover {
+    .export:hover, .sxStop:hover, .clearFull:hover, .clear:hover {
         opacity: 0.8;
         text-decoration:underline;
     }
@@ -93,12 +137,14 @@
 <script type="text/javascript" src="./imex_port.js"></script>
 <script>
     window.onload = function () {
-        let exp = document.getElementsByClassName("export")[0]
-        let sxStop = document.getElementsByClassName("sxStop")[0]
-        let carDate = document.getElementsByClassName("car")
-        let originDate = document.getElementById("txt")
+        const exp = document.getElementsByClassName("export")[0]
+        const sxStop = document.getElementsByClassName("sxStop")[0]
+        const carDate = document.getElementsByClassName("car")
+        const originDate = document.getElementById("txt")
+        const clearBtn = document.getElementsByClassName("clear")[0]
+        const clearBtn1 = document.getElementsByClassName("clearFull")[0]
         let carForm = new Array()
-        let  handleArr = new Array()
+        let handleArr = new Array()
         const obj = {
             "A_VNO": "序列号",
             "A_VID": "商品编码",
@@ -110,18 +156,36 @@
             "A_VID_DJNO": "电机编号",
             "A_FCDATE": "生产日期"
         }
+
         Object.keys(obj).map(item => {
             handleArr.push({"old": item, "new": obj[item]})
         })
 
+        clearBtn.onclick = function () {
+            Emptycontent()
+        }
+
         sxStop.onclick = function (){
             handleDate()
-            // 清空前面4个input框的内容
-            // for(var i=0; i<=3; i++) {
-            //     carDate[i].value = ''
-            // }
             originDate.value = ''
         }
+
+        clearBtn1.onclick = function () {
+            let flag = confirm("您确定要删除暂存区里的内容，该操作无法恢复")
+            if (flag) {
+                carForm = []
+                Emptycontent()
+            }
+        }
+
+        // 清空文本框内容
+        function Emptycontent () {
+            for(var i=0;i<=3;i++){
+                carDate[i].value = ''
+            }
+            originDate.value = ''
+        }
+
         function handleDate () {
             // 获取4个input框里的内容和文本域里面的内容
             let car_name = carDate[0].value
@@ -143,6 +207,7 @@
             // 添加数据到暂存区
             carForm.push(...txt["rows"])
         }
+        
         exp.onclick = function () {
             var _this = this;
             // console.log(typeof(arr));
