@@ -54,6 +54,7 @@ function importfun(obj, callback) {
 var tmpDown; //导出的二进制对象
 function downloadExl(obj, json, callback, type) {
     var tmpdata = json[0];
+    if(!tmpdata) return alert("请输入数据后重试") 
     json.unshift({});
     var keyMap = []; //获取keys
     //keyMap =Object.keys(json[0]);
@@ -149,8 +150,10 @@ var imExPortPlugin = {
         var jsono = obj.data;// 需要导出的数据
         formatfun(jsono, obj, function (res) {
             // 转化格式成功
+            if(!jsono) return console.log(1);
             // res为转化格式后的数组
-            downloadExl(obj, res, function () {      
+            downloadExl(obj, res, function () {  
+                if(!jsono) return console.log(2);    
                 // 下载成功
                 obj.success()
             })
