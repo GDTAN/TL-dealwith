@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="./xlsx.full.min.js"></script>
+    <title>物料号处理</title>
+</head>
+
+<body>
+    <input type="file" id="file" >
+    <a href="javascript:void(0)" id="export">导出</a>
+</body>
+
+</html>
+<script type="text/javascript" src="./imex_port.js"></script>
+<script>
+    window.onload = function () {       
+        var file = document.getElementById("file")
+        var exp = document.getElementById("export")
+        var arr = new Array;
+        let headTitle = new Array;
+        const Ttitle =  ["车型代码", "整车类型", "车型名称", "配置", "款式", "品牌", "规格", "车型系列", "单位", "成本价", "计划成本价", "零售价", "批发价", "最低销售价", "批发价2", "批发价3",    "批发价4", "厂家建议零售价", "三包返厂价", "返利(每台/元)", "停产", "条码", "停售", "合格证号前缀", "发动机号前缀", "车架号前缀", "产地", "五笔码", "拼音码", "备注",  "颜色", "批次号", "合格证号", "车架号", "发动机号", "验收",  "制造商", "出厂日期", "最低库存", "最高库存", "合格证条码"]
+        Ttitle.map(item => {
+            headTitle.push({"old": item, "new": item})
+        })
+
+        file.onchange = function () {
+            var _this = this;
+            // 需要注意要导入的Excel文件最好把数据格式转为文本格式
+            imExPortPlugin.import({
+                "dom": _this,// 导入文件时的input dom
+                "format": [
+                    { "old": "下线日期", "new": "下线日期" },
+                    { "old": "交货", "new": "交货" },
+                    { "old": "入库员", "new": "入库员" },
+                    { "old": "公司间交货", "new": "公司间交货" },
+                    { "old": "公司间采购订单", "new": "公司间采购订单" },
+                    { "old": "售达方", "new": "售达方" },
+                    { "old": "售达方描述", "new": "售达方描述" },
+                    { "old": "工厂", "new": "工厂" },
+                    { "old": "库存地点", "new": "库存地点" },
+                    { "old": "打包线", "new": "打包线" },
+                    { "old": "描述", "new": "描述" },
+                    { "old": "数量", "new": "数量" },
+                    { "old": "条码", "new": "合格证号" },
+                    { "old": "物料号", "new": "物料号" },
+                    { "old": "物料描述", "new": "物料描述" },
+                    { "old": "状态", "new": "状态" },
+                    { "old": "生产线别", "new": "生产线别" },
+                    { "old": "用户名", "new": "用户名" },
+                    { "old": "电机号", "new": "电机号" },
+                    { "old": "订单号", "new": "订单号" },
+                    { "old": "更改日期", "new": "更改日期" }
+                ],
+                "success": function (res) {
+                    arr = res;
+                    arr.map(item => {
+                        let t = item["物料描述"].split("—")
+                        item["车型名称"] = t[0]
+                        if(t[1]){
+                            //console.log(t[1].indexOf("("))
+                            if(t[1].indexOf("(") !== -1) {
+                                item["颜色"] = t[1].slice(0, t[1].indexOf("("))
+                                item["配置"] = t[1].substring(t[1].indexOf("(")+1,t[1].indexOf(")"));
+                            } else {
+                                item["颜色"] = t[1]
+                            }
+                            item["车型代码"] = item["物料号"]
+                            item["车型系列"] = item["售达方"]
+                        }
+                        item["发动机号"] = item["电机号"].slice(item["电机号"].indexOf("-")-11,item["电机号"].indexOf("-"))
+                        item["品牌"] = "雅迪"
+                        item["单位"] = "辆"
+                        item["合格证条码"] =item["车架号"] = item["合格证号"]
+                        item["出厂日期"] = item["更改日期"]
+                        
+
+                    })
+                    console.log(arr)
+                }//导入成功后的回调
+            })
+        }
+        function formatTime() {
+            let e = new Date()
+            let Y = e.getFullYear()
+            let M = e.getMonth() + 1
+            let D = e.getDate()
+            return `${Y}-${M}-${D}`
+        }
+        
+       
+
+        exp.onclick = function () {
+            var _this = this;
+            imExPortPlugin.export({
+                "data": arr,
+                "format":headTitle,
+                "dom": _this,
+                "filename": `合格证导入${formatTime()}.xlsx`,
+                "success": function () {      
+                   alert('文件导出成功')
+                }
+            })
+        }
+
+    }
+</script>
