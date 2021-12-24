@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script type="text/javascript" src="./xlsx.full.min.js"></script>
+    <title>台铃处理工具old</title>
+</head>
+
+<body>
+    <div class="header">
+        车型名称
+        <input type="text" name="car_name" class="car" value="">
+        型号
+        <input type="text" name="car_Model" class="car" value="">
+        规格
+        <input type="text" name="car_Desc" class="car" value="">
+        颜色
+        <input type="text" name="car_Color" class="car" value="">
+    </div>
+    <div class="content">   
+        <textarea rows="20" cols="20" id="txt"></textarea>
+        <button class="clear">清空文本框</button>
+        <button class="clearFull">清空暂存区</button>
+        <button class="sxStop">暂存</button>
+        <a href="javascript:void(0)" class="export">导出</a>
+    </div>
+</body>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .header{
+        margin: 10px 0 0 10px;
+    }
+
+    .car {
+        height: 20px;
+        margin: 0 10px 0 5px;
+    }
+
+    .content {
+        position: relative;
+        /* background-color: pink; */
+    }
+
+    #txt {
+        margin: 10px;
+        width: 500px;
+        height: 500px;
+        resize: none;
+        background-color: rgba(250, 247, 247, 0.842);
+        /* background-color: red;     */
+    }
+    .clear {
+        position: absolute;
+        top: 50px;
+        left: 600px;
+        /* background-color: yellow; */
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #E6A23C;
+        color: white;
+        border: none;
+        text-decoration:none;
+    }
+
+    .clearFull{
+        position: absolute;
+        top: 180px;
+        left: 600px;
+        /* background-color: yellow; */
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #F78989;
+        color: white;
+        border: none;
+        text-decoration:none;
+    }
+
+    .sxStop{
+        position: absolute;
+        bottom: 180px;
+        left: 600px;
+        /* background-color: yellow; */
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #67C23A;
+        color: white;
+        border: none;
+        text-decoration:none;
+    }
+
+    .export {
+        position: absolute;
+        bottom: 50px;
+        left: 600px;
+        /* background-color: yellow; */
+        cursor: pointer;
+        width: 160px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: #5EADFF;
+        color: white;
+        border: none;
+        text-decoration:none;
+    }
+
+    .export:hover, .sxStop:hover, .clearFull:hover, .clear:hover {
+        opacity: 0.8;
+        text-decoration:underline;
+    }
+</style>
+
+</html>
+
+
+<script type="text/javascript" src="./imex_port.js"></script>
+<script>
+    window.onload = function () {
+        const exp = document.getElementsByClassName("export")[0]
+        const sxStop = document.getElementsByClassName("sxStop")[0]
+        const carDate = document.getElementsByClassName("car")
+        const originDate = document.getElementById("txt")
+        const clearBtn = document.getElementsByClassName("clear")[0]
+        const clearBtn1 = document.getElementsByClassName("clearFull")[0]
+        let carForm = new Array()
+        let handleArr = new Array()
+        const obj = {
+            "A_VNO": "序列号",
+            "A_VID": "商品编码",
+            "car_Name": "商品名称",
+            "car_Desc": "规格",
+            "car_Model": "型号",
+            "car_Color": "颜色",
+            "A_VID_CJNO": "车架编号",
+            "A_VID_DJNO": "电机编号",
+            "A_FCDATE": "生产日期"
+        }
+
+        Object.keys(obj).map(item => {
+            handleArr.push({"old": item, "new": obj[item]})
+        })
+
+        clearBtn.onclick = function () {
+            Emptycontent()
+        }
+
+        sxStop.onclick = function (){
+            handleDate()
+            originDate.value = ''
+        }
+
+        clearBtn1.onclick = function () {
+            let flag = confirm("您确定要删除暂存区里的内容，该操作无法恢复")
+            if (flag) {
+                carForm = []
+                Emptycontent()
+            }
+        }
+
+        // 清空文本框内容
+        function Emptycontent () {
+            for(var i=0;i<=3;i++){
+                carDate[i].value = ''
+            }
+            originDate.value = ''
+        }
+
+        function handleDate () {
+            // 获取4个input框里的内容和文本域里面的内容
+            let car_name = carDate[0].value
+            let car_Model = carDate[1].value
+            let car_Desc = carDate[2].value
+            let car_Color = carDate[3].value
+            let txt = originDate.value
+            // 判断是否为空
+            if(!car_name || !car_Model || !car_Desc || !car_Color || !txt) return alert("请输入正确的数据")
+            // 处理一下获取回来的数据 ，JSON.parse遇到''报错
+            txt = JSON.parse(txt.replace(/'/g, '"'))
+            // 给数据添加字段
+            txt["rows"].map(item => {
+                item["car_Name"]=car_name
+                item["car_Model"]=car_Model
+                item["car_Desc"]=car_Desc
+                item["car_Color"]=car_Color
+            })
+            // 添加数据到暂存区
+            carForm.push(...txt["rows"])
+        }
+        
+        exp.onclick = function () {
+            var _this = this;
+            // console.log(typeof(arr));
+            handleDate()
+            // console.log(carForm)
+            if(!carForm.length) return alert("请输入数据之后再导出")
+            imExPortPlugin.export({
+                "data": carForm,
+                "format": handleArr,
+                "dom": _this,
+                "filename": `源文件${Math.ceil(100*(Math.random()+1))}.xlsx`,
+                "success": function () {
+                   alert("数据处理成功，请下载到本地")
+                }
+            })
+            Emptycontent()
+            carForm.length = 0
+        }
+    }
+</script>
