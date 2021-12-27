@@ -60,8 +60,18 @@
                     arr = res;
                     arr.map(item => {
                         if(item["更改日期"]){
-                        var dta = new Date(item["更改日期"])
-                        console.log(dta)
+                        var data = new Date(item["更改日期"])
+                        let time = new Date((data - 25567) * 24 * 3600000 - 5 * 60 * 1000 - 43 * 1000 - 24 * 3600000 - 8 * 3600000)
+                        let year = time.getFullYear() + ''
+                        // console.log('year:' + year)
+                        let month = time.getMonth() + 1 + ''
+                        // console.log('month:' + month)
+                        let date = time.getDate() + ''
+                        // console.log('data:' + date)
+                        item["更改日期"] = `${year}-${month}-${date}`
+                        }
+                        if(item["物料描述"]) {
+                        item["物料描述"] = item["物料描述"].replace(/\（/g, "(").replace(/\）/g, ")")
                         }
                         let t = item["物料描述"].split("—")
                         item["车型名称"] = t[0]
