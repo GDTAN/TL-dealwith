@@ -59,6 +59,9 @@
                 "success": function (res) {
                     arr = res;
                     arr.map(item => {
+                        if(item["物料号"]){
+                            item["物料号"] = String(item["物料号"]).slice(0,item["物料号"].length-1)
+                        }
                         if(item["更改日期"]){
                         var data = new Date(item["更改日期"])
                         let time = new Date((data - 25567) * 24 * 3600000 - 5 * 60 * 1000 - 43 * 1000 - 24 * 3600000 - 8 * 3600000)
