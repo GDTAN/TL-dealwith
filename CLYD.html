@@ -59,6 +59,7 @@
                 "success": function (res) {
                     arr = res;
                     arr.map(item => {
+                        console.log(item["更改日期"])
                         let t = item["物料描述"].split("—")
                         item["车型名称"] = t[0]
                         if(t[1]){
