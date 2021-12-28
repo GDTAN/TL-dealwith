@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -13,7 +13,7 @@
 
 <body>
     <div class="content"> 
-        <p>localStorage.removeItem("lastname");localStorage.setItem("lastname", JSON.stringify($('#VInfoDetail')[0].dfop.rowdatas))</p>
+        <p>&nbsp;&nbsp;localStorage.removeItem("lastname");localStorage.setItem("lastname", JSON.stringify($('#VInfoDetail')[0].dfop.rowdatas))</p>
         <textarea rows="20" cols="20" id="txt"></textarea>
         <a href="javascript:void(0)" class="export">导出</a>
     </div>
@@ -67,6 +67,7 @@
 <script type="text/javascript" src="./imex_port.js"></script>
 <script>
     window.onload = function () {
+        let ch = '/'
         let exp = document.getElementsByClassName("export")[0]
         let headerDate = new Array()
         let bigArr = new Array()
@@ -130,12 +131,20 @@
                 }
             })
             bigArr = flatten(newArr)
+            // console.log(bigArr)
             bigArr.map(item => {
+                if(item["V_NO"]){
                     item["品牌"] = "台铃"
                     item["合格证条码"] = item["V_NO"]
-                    item["SC_DATE"] = item["SC_DATE"].replace(/(\/)/g, '-')
                     item["Th"] = item["Th"] === null ? '' : item["Th"]
+                } 
+                if(item["SC_DATE"]) {
+                    item["SC_DATE"] = item["SC_DATE"].replace(new RegExp(ch,'g'),'-')
+                }  else {
+                    item["SC_DATE"] = ''
+                }              
             })
+            // console.log(bigArr)
         }
         exp.onclick = function () {
             const _this = this
